@@ -1,0 +1,624 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<graphics.h>	
+#include<conio.h>
+#include<malloc.h>
+#include<Windows.h>
+#include<time.h>
+
+typedef struct SNAKE
+{
+	int xx;
+	int yy;
+	struct SNAKE* last;
+	struct SNAKE* next;
+}snake,*link;                     /*蛇的结构*/
+
+link head, end;
+char key = 'w';
+char key_temp='\0';
+int food_x, food_y;                                           /*基本变量声明*/
+int SleepTime = 70;
+int game();
+int choose();
+int GameOver();
+int score = 0;
+int b;
+int poison_x, poison_y;
+int bomb_x, bomb_y;
+int x = 1480, y = 750;
+int bombnumber = 20;
+
+int main()
+{
+	initgraph(480, 680);
+	setbkcolor(WHITE);
+	cleardevice();					/*让颜色显示出来*/
+
+	IMAGE action;
+	loadimage(&action, "action.jpg", 480, 680);
+	putimage(0, 0, &action);
+
+	
+	MOUSEMSG m;
+	while (1)
+	{
+		m = GetMouseMsg();
+		if (m.x > 40 && m.y > 550 && m.x < 420 && m.y < 680)
+		{
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				closegraph();
+				choose();
+			}
+
+		}
+	}
+	return 0;
+}
+/* 开始界面UI*/
+int choose()
+{
+	initgraph(480, 700);
+	setbkcolor(WHITE);
+	cleardevice();					/*让颜色显示出来*/
+
+	IMAGE choose_difficulty;
+	loadimage(&choose_difficulty, "choose_difficulty.jpg", 480, 700);
+	putimage(0, 0, &choose_difficulty);
+
+	setlinecolor(WHITE);
+	settextcolor(RGB(230,130,238));
+	setbkmode(TRANSPARENT);
+	settextstyle(70, 50, _T("幼圆"));
+	outtextxy(40, 5, "选择难度");
+
+	setlinecolor(WHITE);
+	settextcolor(RGB(210,105,30));
+	setbkmode(TRANSPARENT);
+	settextstyle(50, 30, _T("幼圆"));
+	outtextxy(100, 120, "有手就行");
+	outtextxy(100, 240, "猴子都行");
+	outtextxy(150, 360, "一般");
+	outtextxy(100, 480, "有点点难");
+	outtextxy(130, 600, "我是神");
+
+	rectangle(90, 110, 380, 180);
+	rectangle(90, 230, 380, 300);
+	rectangle(90, 350, 380, 420);
+	rectangle(90, 470, 380, 540);
+	rectangle(90, 590, 380, 660);
+
+
+	MOUSEMSG m;
+	while (1)
+	{
+		m = GetMouseMsg();
+		if (m.x > 85 && m.y > 105 && m.x < 385 && m.y < 185)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(100, 120, "有手就行");
+			rectangle(90, 110, 380, 180);
+			if(m.uMsg==WM_LBUTTONDOWN)
+			{
+				
+				bombnumber = 0;
+				SleepTime = 200;
+				closegraph();
+				game();
+			}
+		}
+		
+		else if (m.x > 85 && m.y > 225 && m.x < 385 && m.y < 305)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(100, 240, "猴子都行");
+			rectangle(90, 230, 380, 300);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				bombnumber = 5;
+				SleepTime = 150;
+				closegraph();
+				game();
+			}
+		}
+		else if (m.x > 85 && m.y > 345 && m.x < 385 && m.y < 425)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(150, 360, "一般");
+			rectangle(90, 350, 380, 420);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				bombnumber = 10;
+				SleepTime = 80;
+				closegraph();
+				game();
+			}
+		}
+		else if (m.x > 85 && m.y > 465 && m.x < 385 && m.y < 545)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(100, 480, "有点点难");
+			rectangle(90, 470, 380, 540);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				bombnumber = 15;
+				SleepTime = 50;
+				closegraph();
+				game();
+			}
+		}
+		else if (m.x > 85 && m.y > 585 && m.x < 385 && m.y < 665)
+			{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(130, 600, "我是神");
+			rectangle(90, 590, 380, 660);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				bombnumber = 20;
+				SleepTime = 40;
+				closegraph();
+				game();
+			}
+			}
+		else {
+			setlinecolor(WHITE);
+			settextcolor(RGB(210, 105, 30));
+			setbkmode(TRANSPARENT);
+			settextstyle(50, 30, _T("幼圆"));
+			outtextxy(100, 120, "有手就行");
+			outtextxy(100, 240, "猴子都行");
+			outtextxy(150, 360, "一般");
+			outtextxy(100, 480, "有点点难");
+			outtextxy(130, 600, "我是神");
+
+			rectangle(90, 110, 380, 180);
+			rectangle(90, 230, 380, 300);
+			rectangle(90, 350, 380, 420);
+			rectangle(90, 470, 380, 540);
+			rectangle(90, 590, 380, 660);
+
+		}
+	}
+	  
+
+
+	_getch();
+	closegraph();
+	system("pause");
+	return 0;
+}
+
+
+void leftpicture()
+{
+	setfillcolor(RGB(255, 193, 193));
+	fillrectangle(0, 0, 1099, 750);
+}
+void rightpicture()
+{
+	IMAGE right;
+	loadimage(&right, "right.jpg", 380, 750);
+	putimage(1101, 0, &right);
+
+	setbkmode(TRANSPARENT);
+	setbkmode(TRANSPARENT);
+	settextcolor(RGB(78, 55, 247));
+	settextstyle(40, 0, "幼圆");
+	outtextxy(1250, 400, "SCORE");
+	
+}                                 
+void text()
+{
+	char a[] = "蛇蛇胡乱跑";
+	setbkmode(TRANSPARENT);
+	settextcolor(RGB(78, 55, 247));
+	settextstyle(40, 0, "幼圆");
+	outtextxy(1180, 50, a);			 /*注意要修改项目属性为多字节*/
+}
+void line()
+{
+	setlinecolor(RED);
+	line(1100, 0, 1100, 750);					 /*画分割线*/
+}
+//坐标属性                                                     /*game界面UI*/
+
+int Snake_color()
+{
+	srand(time(NULL));
+	b = rand() % (50) + 0;
+	printf("%d ", b);
+	return b;
+}
+
+void creat_snake_list()
+{
+	head = (link)malloc(sizeof(snake));
+	end = (link)malloc(sizeof(snake));
+	head->last = NULL;
+	head->next = end;
+	end->last = head;
+	end->next = NULL;
+
+}
+void creat_snake_head(link head, link end)
+{
+	link body1;
+	body1 = (link)malloc(sizeof(snake));
+	head->next = body1;
+	end->last = body1;
+	body1->last = head;
+	body1->next = end;
+	body1->xx = 25;
+	body1->yy = 25;
+	
+}
+void draw_snake_list(link head, link end)
+{
+	link p;
+	p = head->next;
+	setlinecolor(RGB(139,0,139));
+	setfillcolor(RGB(255,62,150));
+	while (p != end)
+	{
+		fillcircle((p->xx * 25) - 20, (p->yy * 25) - 20, 13);
+		p = p->next;
+	}
+
+}
+void hide_snake_list(link head, link end)
+{
+	link p;
+	p = head->next;
+	setlinecolor(RGB(255, 193, 193));
+	setfillcolor(RGB(255, 193, 193));
+	while (p != end)
+	{
+		fillcircle((p->xx * 25) - 20, (p->yy * 25) - 20, 13);
+		p = p->next;
+	}
+}
+void snake_move(link head, link end)
+{
+	link p;
+	link q;
+	p = head->next;
+	q = end->last;
+	while (q->last != head)
+	{
+		if (q->last == NULL) { GameOver(); }
+		q->xx = q->last->xx;
+		q->yy = q->last->yy;
+		q = q->last;
+	}
+	
+	if (key == 'w')
+		p->yy--;
+	else if (key == 's')
+		p->yy++;
+	else if (key == 'a')
+		p->xx--;
+	else if (key == 'd')
+		p->xx++;
+	
+}
+void check_key(char key_t)
+{
+	if (key_temp == '\0')
+		return;
+	else if (key_t == 'a'&& key != 'd')
+		key = key_t;
+	else if (key_t == 'd'&& key != 'a')
+		key = key_t;
+	else if (key_t == 'w'&& key != 's')
+		key = key_t;
+	else if (key_t == 's'&& key != 'w')
+		key = key_t;
+}                              /*待添加嘲讽界面*/
+int check_SnakeAndWall(link head, link end)
+{
+	link p;
+	p = head->next;
+	if (p->xx <= 0 || p->xx > 44 || p->yy <= 0 || p->yy > 30)
+		return 0;
+	return 1;
+}
+int check_SnakeAndFood(link head, link end)
+{
+	link p;
+	p = head->next;
+	while (p != end)
+	{
+		if (food_x == p->xx&&food_y == p->yy)
+			return 1;
+		p = p->next;
+	}
+	return 0;
+}
+void draw_food()
+{
+	setfillcolor(RED);
+	fillcircle((food_x * 25) - 20, (food_y * 25) - 20, 13);
+}
+void creat_food(link head, link end)
+{
+	do
+	{
+		srand((unsigned)time(NULL));
+		food_x = rand() % 44 + 1;
+		food_y = rand() % 30 + 1;
+	
+	} while (check_SnakeAndFood(head, end) == 1);
+	draw_food();
+}
+void SnakeBodyAdd(link head,link end)
+{
+	link body, p, q;
+	body = (link)malloc(sizeof(snake));
+	p = end->last;
+	body->xx = food_x;
+	body->yy = food_y;
+	p->next = body; 
+	end->last = body;
+	body->last = p;
+	body->next = end;
+	creat_food(head, end);
+	 
+}
+int check_SnakeandBody(link head, link end)
+{
+	link p, q;
+	p = head->next;
+	q = end->last;
+	while (q->last != head)
+	{
+		if (p->xx == q->xx&&p->yy == q->yy)
+			return 2;
+		q = q->last;
+		
+	}
+	return 0;
+}
+int check_SnakeAndPoison(link head, link end)
+{
+	link p;
+	p = head->next;
+	while (p != end)
+	{
+		if (poison_x == p->xx&&poison_y == p->yy)
+			return 1;
+		p = p->next;
+	}
+	return 0;
+}
+int check_SnakeAndbomb(link head, link end)
+{
+	link p;
+	p = head->next;
+	while (p != end)
+	{
+		if (bomb_x == p->xx&&bomb_y == p->yy)
+		{
+			GameOver;
+			return 3;
+		}
+			
+		p = p->next;
+	}
+	return 0;
+}
+void draw_poison()
+{
+	setfillcolor(GREEN);
+	fillcircle((poison_x * 25) - 20, (poison_y * 25) - 20, 13);
+}
+void creat_poison(link head, link end)
+{
+	do
+	{
+		poison_x = rand() % 41 + 2;
+		poison_y = rand() % 28 + 2;
+
+	} while (check_SnakeAndPoison(head, end) == 1);
+	/*draw_poison();*/
+}                                                             /*游戏运行的函数*/
+void SnakeBodyDelete(link head,link end)
+{
+	link poison, p, q;
+	poison = (link)malloc(sizeof(snake));
+	p = end->last->last;
+	q = end->last;
+	if (end->last == NULL)
+	{
+		GameOver();
+	}
+	p->next = end;
+	end->last = p;
+	free(q);
+}
+void draw_bomb()
+{
+	setfillcolor(YELLOW);
+	fillcircle((bomb_x * 25) - 20, (bomb_y * 25) - 20, 13);
+}
+void creat_bomb(link head, link end)
+{
+	do
+	{
+		bomb_x = rand() % 42 + 1;
+		bomb_y = rand() % 29 + 1;
+
+	} while (check_SnakeAndbomb(head, end) == 3);
+	
+}                                                             /*游戏运行的函数*/
+void draw_bomb2()
+{
+	setlinecolor(RED);
+	setfillcolor(YELLOW);
+	fillcircle((bomb_x * 25) - 20, (bomb_y * 25) - 20, 13);
+}
+void creat_bomb2(link head, link end)
+{
+	do
+	{
+		bomb_x = rand() % 42 + 1;
+		bomb_y = rand() % 29 + 1;
+
+	} while (check_SnakeAndbomb(head, end) == 3);
+
+}                                                             /*游戏运行的函数*/
+void SnakeBodyDestroy(link head, link end)
+{
+	link bomb, p, q,z,w;
+	bomb = (link)malloc(sizeof(snake));
+	p = end->last->last->last->last->last;
+	q = end->last;
+	z = end->last->last;
+	w= end->last->last->last;
+	if (1)
+	{
+	GameOver();
+	p->next = end;
+	end->last = p;
+	free(q);
+	free(z);
+	free(w);
+	}
+	
+}
+
+
+int game()
+{
+	initgraph(x, y);
+	setbkcolor(WHITE);
+	cleardevice();					                         /*让颜色显示出来*/
+
+	leftpicture();
+	rightpicture();
+	text();
+	line();
+
+	creat_snake_list();
+	creat_snake_head(head, end);
+	draw_snake_list(head, end);
+	creat_food(head, end);
+	draw_food();
+	creat_poison(head, end);
+	draw_poison();
+	
+	
+	creat_bomb(head, end);
+	draw_bomb();
+	
+	
+	
+	while (1)
+	{
+		Sleep(SleepTime);                                    /*预留调整难度*/
+		hide_snake_list(head, end);
+		if (_kbhit())
+			key_temp = _getch();
+		check_key(key_temp);
+		
+		if (check_SnakeAndWall(head, end) == 0)
+		{
+			/*准备写嘲讽*/
+			
+			GameOver();
+		}
+			
+			                                 
+		if (check_SnakeandBody(head,end) == 2)
+		{
+			/*准备写嘲讽*/
+			
+			GameOver();
+		}
+		if (check_SnakeAndFood(head, end) == 1)
+		{
+			SnakeBodyAdd(head,end);
+			draw_food();
+			for (int i = 0; i <= bombnumber; i++)
+			{
+				
+					/*SnakeBodyDestroy(head, end);*/
+					creat_bomb2(head, end);
+					draw_bomb2();
+				
+			}
+
+		}
+		if (check_SnakeAndPoison(head, end) == 1)
+		{
+			SnakeBodyDelete(head,end);
+			creat_poison(head, end);
+			draw_poison();
+			
+			
+		}
+		for (int i = 0; i <= bombnumber; i++) 
+		{
+			if (check_SnakeAndbomb(head, end) == 3)
+			{
+			/*SnakeBodyDestroy(head, end);*/
+			creat_bomb(head, end);
+			draw_bomb();
+
+			GameOver();
+			}
+		}
+		
+        snake_move(head,end);
+		draw_snake_list(head,end);
+	}
+
+	_getch();
+	closegraph();
+	system("pause");
+	return 0;
+}
+
+//开始写gameover的嘲讽
+int GameOver()
+{
+	initgraph(1250, 600);
+	setbkcolor(WHITE);
+	cleardevice();				                           	/*让颜色显示出来*/
+	IMAGE GameOver;
+	loadimage(&GameOver, "GameOver.jpg", 1250, 600);
+	putimage(0, 0, &GameOver);
+	MOUSEMSG m;
+	while (1)
+	{
+		m = GetMouseMsg();
+		if (m.x > 800 && m.y > 80 && m.x < 1230 && m.y < 250)
+		{
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				return 0;
+				closegraph();
+				
+			}
+		}
+		else if (m.x > 800 && m.y > 330 && m.x < 1230 && m.y < 490)
+		{
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				choose();
+			}
+		}
+	}
+	
+	closegraph();
+	_getch();
+	system("pause");
+	return 0;
+}
+
+//开始写关卡选择

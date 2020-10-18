@@ -28,7 +28,52 @@ int poison_x, poison_y;
 int bomb_x, bomb_y;
 int x = 1480, y = 750;
 int bombnumber = 20;
+int main();
 
+void introduce()
+{
+	initgraph(480, 680);
+	setbkcolor(WHITE);
+	cleardevice();					/*让颜色显示出来*/
+
+	IMAGE introduce;
+	loadimage(&introduce, "introduce.jpg", 480, 680);
+	putimage(0, 0, &introduce);
+
+	setlinecolor(RGB(255, 165, 0));
+	setfillcolor(WHITE);
+	rectangle(340, 20, 450, 60);
+	settextcolor(RGB(255, 165, 0));
+	settextstyle(20, 0, _T("幼圆"));
+	outtextxy(370, 30, "返回");
+	MOUSEMSG m;
+	while (1)
+	{
+		m = GetMouseMsg();
+		if (m.x > 340 && m.y > 20 && m.x < 450 && m.y < 60)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(370, 30, "返回");
+			rectangle(340, 20, 450, 60);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+
+				closegraph();
+				main();
+
+			}
+		}
+		else {
+			setlinecolor(RGB(255, 165, 0));
+			setfillcolor(WHITE);
+			rectangle(340, 20, 450, 60);
+			settextcolor(RGB(255, 165, 0));
+			settextstyle(20, 0, _T("幼圆"));
+			outtextxy(370, 30, "返回");
+		}
+	}
+}
 int main()
 {
 	initgraph(480, 680);
@@ -38,12 +83,39 @@ int main()
 	IMAGE action;
 	loadimage(&action, "action.jpg", 480, 680);
 	putimage(0, 0, &action);
-
-	
+	setlinecolor(RGB(255, 165, 0));
+	setfillcolor(WHITE);
+	rectangle(10, 20, 120, 60);
+	settextcolor(RGB(255, 165, 0));
+	settextstyle(20, 0, _T("幼圆"));
+	outtextxy(20, 30, "游戏说明");
 	MOUSEMSG m;
 	while (1)
 	{
 		m = GetMouseMsg();
+		if (m.x > 10 && m.y > 20 && m.x < 120 && m.y < 60)
+		{
+			settextcolor(BLUE);
+			setlinecolor(BLUE);
+			outtextxy(20, 30, "游戏说明");
+			rectangle(10, 20, 120, 60);
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				
+				closegraph();
+				introduce();
+
+			}
+		}
+		else {
+			setlinecolor(RGB(255, 165, 0));
+			setfillcolor(WHITE);
+			rectangle(10, 20, 120, 60);
+			settextcolor(RGB(255, 165, 0));
+			settextstyle(20, 0, _T("幼圆"));
+			outtextxy(20, 30, "游戏说明");
+		}
+		
 		if (m.x > 40 && m.y > 550 && m.x < 420 && m.y < 680)
 		{
 			if (m.uMsg == WM_LBUTTONDOWN)
@@ -118,7 +190,7 @@ int choose()
 			rectangle(90, 230, 380, 300);
 			if (m.uMsg == WM_LBUTTONDOWN)
 			{
-				bombnumber = 5;
+				bombnumber = 0;
 				SleepTime = 150;
 				closegraph();
 				game();
@@ -132,7 +204,7 @@ int choose()
 			rectangle(90, 350, 380, 420);
 			if (m.uMsg == WM_LBUTTONDOWN)
 			{
-				bombnumber = 10;
+				bombnumber = 0;
 				SleepTime = 80;
 				closegraph();
 				game();
